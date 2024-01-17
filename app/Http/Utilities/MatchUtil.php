@@ -17,21 +17,29 @@ class MatchUtil
         $homeDefence = (float)$match->homeTeam->defence_score * 1.03;
         $awayDefence = (float)$match->awayTeam->defence_score;
 
-        if (0 > $homeAttack - $awayDefence) {
-            $homeScore = mt_rand(0, 2);
-        } else {
-            $homeScore = mt_rand(0, (round($homeAttack - $awayDefence) <= 8) ?? 8);
-        }
-
-        if (0 > $awayAttack - $homeDefence) {
-            $awayScore = mt_rand(0, 2);
-        } else {
-            $awayScore = mt_rand(0, (round($homeAttack - $awayDefence) <= 8) ?? 8);
-        }
-
         return array(
-            "home_score" => $homeScore,
-            "away_score" => $awayScore
+            "home_score" => $this->randomizeCalculator($homeAttack, $awayDefence),
+            "away_score" => $this->randomizeCalculator($awayAttack, $homeDefence)
         );
+    }
+
+    /**
+     * @param $firstTeamScore
+     * @param $secondTeamDefence
+     * @return int
+     */
+    protected function randomizeCalculator($firstTeamScore, $secondTeamDefence): int
+    {
+        if (0 > $firstTeamScore - $secondTeamDefence) {
+            $teamScore = mt_rand(0, 2);
+        } else {
+            if ($firstTeamScore - $secondTeamDefence >= 8) {
+                $rand = 8;
+            } else {
+                $rand = $firstTeamScore - $secondTeamDefence;
+            }
+            $teamScore = mt_rand(0, round($rand));
+        }
+        return $teamScore;
     }
 }
